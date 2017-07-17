@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import MapView from 'react-native-maps'
 import SplashScreen from 'react-native-smart-splash-screen'
+import getDirections from 'react-native-google-maps-directions'
 import {
   AppRegistry,
   StyleSheet,
@@ -10,7 +11,7 @@ import {
   Alert,
   TextInput,
   Dimensions,
-  Picker
+  Picker,
 } from 'react-native'
 
 const { width } = Dimensions.get('window')
@@ -48,19 +49,64 @@ export default class AwesomeProject extends Component {
       station: '',
       feeder: '',
       faultcat: '',
+      latitude: '',
+      longitude: '',
+      error: '',
     }
   }
+  componentWillUnmount() {
+    navigator.geolocation.clearWatch(this.watchId);
+  }
   componentDidMount () {
-    //SplashScreen.close(SplashScreen.animationType.scale, 850, 500) 
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null,
+        });
+      },
+      (error) => this.setState({ error: error.message }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    )
+    // this.watchId = navigator.geolocation.watchPosition(
+    //   (position) => {
+    //     this.setState({
+    //       latitude: position.coords.latitude,
+    //       longitude: position.coords.longitude,
+    //       error: null,
+    //     });
+    //   },
+    //   (error) => this.setState({ error: error.message }),
+    //   { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 },
+    // )
+
     SplashScreen.close({
       animationType: SplashScreen.animationType.scale,
       duration: 850,
       delay: 500,
     })
   }
-  goTo(){
-    Alert.alert('go to google map')
+  goTo = () => {
+    let data = {
+      source: {
+        latitude: 13.949893,
+        longitude: 101.5110751,
+      },
+      destination: {
+        latitude: 13.9497253,
+        longitude: 101.5112081
+      },
+      params: [
+        {
+          key: "dirflg",
+          value: "w"
+        }
+      ]
+    }
+    //getDirections(data)
   }
+  
   render() {
     return (
       <View style={styles.container}>
@@ -96,19 +142,18 @@ export default class AwesomeProject extends Component {
           selectedValue={this.state.faultcat}
           onValueChange={(itemValue, itemIndex) => this.setState({faultcat: itemValue})}>
           <Picker.Item label="-- โปรดเลือก --" value="" />
-          <Picker.Item label="AG" value="AG" />
-          <Picker.Item label="BG" value="BG" />
-          <Picker.Item label="CG" value="CG" />
-          <Picker.Item label="AB" value="AB" />
-          <Picker.Item label="BC" value="BC" />
-          <Picker.Item label="AC" value="AC" />
-          <Picker.Item label="ABC" value="ABC" />
+          <Picker.Item label="3 P Fault" value="3PFault" />
+          <Picker.Item label="SLG Fault(A)" value="SLGFault_A" />
+          <Picker.Item label="LL Fault(BC)" value="LLFault_BC" />
+          <Picker.Item label="DLG Fault(BC)" value="DLGFault_BC" />
         </Picker>
 
         <Text style={styles.txt}>กระแส Fault</Text>
         <TextInput placeholder='โปรดใส่กระแส Fault'></TextInput>
 
         <Button title='Go to Location' onPress={this.goTo}></Button>
+        <Text>Lat : { this.state.latitude }</Text>
+        <Text>Long : { this.state.longitude }</Text>
       </View>
     )
   }

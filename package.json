@@ -9,6 +9,7 @@
   "dependencies": {
     "react": "16.0.0-alpha.12",
     "react-native": "0.45.1",
+    "react-native-google-maps-directions": "^1.1.0",
     "react-native-maps": "^0.15.3",
     "react-native-smart-splash-screen": "^2.3.4"
   },
