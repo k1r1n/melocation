@@ -51,13 +51,15 @@ export default class AwesomeProject extends Component {
       faultcat: '',
       latitude: '',
       longitude: '',
+      emp: '',
       error: '',
     }
   }
   componentWillUnmount() {
-    navigator.geolocation.clearWatch(this.watchId);
+    //navigator.geolocation.clearWatch(this.watchId);
   }
   componentDidMount () {
+    
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -69,17 +71,6 @@ export default class AwesomeProject extends Component {
       (error) => this.setState({ error: error.message }),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     )
-    // this.watchId = navigator.geolocation.watchPosition(
-    //   (position) => {
-    //     this.setState({
-    //       latitude: position.coords.latitude,
-    //       longitude: position.coords.longitude,
-    //       error: null,
-    //     });
-    //   },
-    //   (error) => this.setState({ error: error.message }),
-    //   { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 },
-    // )
 
     SplashScreen.close({
       animationType: SplashScreen.animationType.scale,
@@ -87,15 +78,28 @@ export default class AwesomeProject extends Component {
       delay: 500,
     })
   }
+
   goTo = () => {
+    let lat = 0
+    let long =0
+    if(this.state.faultcat = '3PFault'){
+      lat = 13.950565,
+      long = 101.508332
+    }
+    else if(this.state.faultcat = 'SLGFault_A'){
+      lat = 13.950653,
+      long = 101.509431
+    }
+      
+    
     let data = {
       source: {
         latitude: 13.949893,
         longitude: 101.5110751,
       },
       destination: {
-        latitude: 13.9497253,
-        longitude: 101.5112081
+        latitude: lat,
+        longitude: long
       },
       params: [
         {
@@ -104,9 +108,9 @@ export default class AwesomeProject extends Component {
         }
       ]
     }
-    //getDirections(data)
+    console.log(this.state)
+    getDirections(data)
   }
-  
   render() {
     return (
       <View style={styles.container}>
@@ -149,11 +153,9 @@ export default class AwesomeProject extends Component {
         </Picker>
 
         <Text style={styles.txt}>กระแส Fault</Text>
-        <TextInput placeholder='โปรดใส่กระแส Fault'></TextInput>
-
+        <TextInput placeholder='โปรดใส่กระแส Fault' keyboardType='numeric' onChangeText={(emp) => this.setState({emp})}></TextInput>
         <Button title='Go to Location' onPress={this.goTo}></Button>
-        <Text>Lat : { this.state.latitude }</Text>
-        <Text>Long : { this.state.longitude }</Text>
+        <Text>{ this.state.latitude }, { this.state.longitude }</Text>
       </View>
     )
   }
